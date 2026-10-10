@@ -1,0 +1,25 @@
+{
+  "name": "HSK 1〜5級 学習アプリ総合メニュー",
+  "short_name": "HSKメニュー",
+  "description": "HSK Level 1〜5 の5つの問題集アプリを紹介し、各レベルへワンタップでジャンプできる公式ポータルアプリです。",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#fff8f6",
+  "theme_color": "#e11d48",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "icons/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "scope": "./"
+}
