@@ -2,20 +2,25 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <title>HSK 1級〜5級 学習アプリ総合メニュー 🐼</title>
   <meta name="description" content="HSK Level 1〜5 の5つの問題集アプリを紹介し、ワンタップで各レベルへジャンプできるPWA対応ポータルメニューです。">
 
   <!-- PWA設定 -->
-  <link rel="manifest" href="manifest.json">
+  <link id="manifest-link" rel="manifest" href="./manifest.json">
   <meta name="theme-color" content="#e11d48">
-  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192x192.png">
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg">
 
-  <!-- iOS ホーム画面アイコン対応 -->
+  <!-- iPad / iPhone (iPadOS / iOS) ホーム画面Webアプリ完全対応 -->
+  <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
   <meta name="apple-mobile-web-app-title" content="HSKメニュー">
-  <link id="apple-touch-icon-link" rel="apple-touch-icon" href="icons/icon-192x192.png">
+  <link id="apple-touch-icon-default" rel="apple-touch-icon" href="./icons/apple-touch-icon.png">
+  <link id="apple-touch-icon-152" rel="apple-touch-icon" sizes="152x152" href="./icons/apple-touch-icon.png">
+  <link id="apple-touch-icon-167" rel="apple-touch-icon" sizes="167x167" href="./icons/apple-touch-icon.png">
+  <link id="apple-touch-icon-180" rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png">
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -36,7 +41,9 @@
         </div>
       </div>
 
-      <span class="hero-badge">🐼 PWA対応・ホーム画面に追加OK</span>
+      <button type="button" id="hero-install-btn" class="hero-badge-btn">
+        <span>📲 タップでホーム画面に追加（iPad・スマホ・PC対応）</span>
+      </button>
       <h1 class="hero-title">HSK 1級〜5級 学習アプリ総合メニュー</h1>
       <p class="hero-subtitle">
         入門の1級（150語）から上級の5級（2,500語）まで、5つのHSK問題集アプリへワンタップでジャンプ！
@@ -66,9 +73,14 @@
         </div>
       </div>
 
-      <button type="button" id="fanfare-try-btn" class="fanfare-try-btn">
-        <span>🎺 100点満点ファンファーレを試聴！</span>
-      </button>
+      <div class="action-btn-group">
+        <button type="button" id="fanfare-try-btn" class="fanfare-try-btn">
+          <span>🎺 100点満点ファンファーレを試聴！</span>
+        </button>
+        <button type="button" id="inline-install-btn" class="install-inline-btn">
+          <span>📲 ホーム画面に追加</span>
+        </button>
+      </div>
     </section>
 
     <!-- アプリ一覧見出し -->
@@ -87,10 +99,73 @@
     <p>&copy; 2026 HSK Level 1-5 Learning Portal &mdash; 加油！毎日の積み重ねが合格への近道🐼</p>
   </footer>
 
-  <!-- PWAインストールボタン -->
-  <button id="install-button" class="install-fab">
+  <!-- PWAインストールフローティングボタン（iPadでも常時表示） -->
+  <button type="button" id="install-button" class="install-fab">
     <span>📲 アプリをホーム画面に追加</span>
   </button>
+
+  <!-- iPad / iPhone / ブラウザ向け「ホーム画面に追加」図解ガイドモーダル -->
+  <div id="ios-install-modal" class="ios-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="ios-modal-title">
+    <div class="ios-modal-card">
+      <div class="ios-modal-header">
+        <h3 id="ios-modal-title">📲 iPad・iPhoneのホーム画面に追加する方法</h3>
+        <button type="button" id="ios-modal-close" class="ios-modal-close" aria-label="閉じる">✕</button>
+      </div>
+      <div class="ios-modal-body">
+        <div class="ios-preview-box">
+          <img id="modal-panda-preview-img" src="icons/panda-cheer-180.png" alt="ホーム画面アイコン">
+          <div class="ios-preview-text">
+            <strong id="modal-panda-preview-name">現在のアイコン：① 応援パンダ</strong>
+            <span>iPadのホーム画面にこの可愛いアイコンで追加されます🐼</span>
+          </div>
+        </div>
+
+        <div class="ios-step-list">
+          <div class="ios-step-item">
+            <span class="ios-step-num">1</span>
+            <div class="ios-step-content">
+              <strong>Safari（またはChrome）</strong>の画面右上（アドレスバーの横）にある
+              <span class="ios-share-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                  <polyline points="16 6 12 2 8 6"/>
+                  <line x1="12" y1="2" x2="12" y2="15"/>
+                </svg>
+                共有ボタン
+              </span>
+              （四角から上向き矢印）をタップします。
+            </div>
+          </div>
+
+          <div class="ios-step-item">
+            <span class="ios-step-num">2</span>
+            <div class="ios-step-content">
+              開いたメニューを少し下にスクロールして、<strong>「➕ ホーム画面に追加」</strong>をタップします。
+            </div>
+          </div>
+
+          <div class="ios-step-item">
+            <span class="ios-step-num">3</span>
+            <div class="ios-step-content">
+              右上の<strong>「追加」</strong>をタップすると、iPadのホーム画面に<strong>「HSKメニュー」</strong>アプリが追加されます！🎉
+            </div>
+          </div>
+        </div>
+
+        <div class="ios-tip-box">
+          <strong>💡 iPadで「ホーム画面に追加」が出ないときは？</strong>
+          ・LINEやメール内ブラウザではなく、<strong>Safariアプリ</strong>で開いてください。<br>
+          ・共有メニューの一番下にある<strong>「アクションを編集...」</strong>から「ホーム画面に追加」をオンにできます。
+          <div class="copy-url-bar">
+            <code id="portal-url-text">https://tamagenai.github.io/HSKMENU/</code>
+            <button type="button" id="copy-url-btn" class="copy-url-btn">📋 URLをコピー</button>
+          </div>
+        </div>
+
+        <button type="button" id="ios-modal-ok-btn" class="ios-modal-ok-btn">わかりました！</button>
+      </div>
+    </div>
+  </div>
 
   <!-- PWA更新通知バナー -->
   <div id="update-notification" class="update-notification">
@@ -111,11 +186,17 @@
       document.getElementById('reload-button').addEventListener('click', () => {
         if (newWorker) {
           newWorker.postMessage({ action: 'skipWaiting' });
+        } else {
+          window.location.reload();
         }
       });
 
       window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./service-worker.js').then((reg) => {
+        navigator.serviceWorker.register('./service-worker.js', { updateViaCache: 'none' }).then((reg) => {
+          if (reg.waiting) {
+            newWorker = reg.waiting;
+            showUpdateBar();
+          }
           reg.addEventListener('updatefound', () => {
             newWorker = reg.installing;
             newWorker.addEventListener('statechange', () => {

@@ -1,20 +1,27 @@
-const CACHE_NAME = 'hsk-menu-portal-v1.0.0';
+const CACHE_NAME = 'hsk-menu-portal-v1.1.0';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './style.css',
   './script.js',
   './manifest.json',
+  './manifest-scholar.json',
+  './manifest-crown.json',
   './favicon.svg',
+  './icons/apple-touch-icon.png',
   './icons/icon-192x192.png',
   './icons/icon-512x512.png',
   './icons/panda-cheer.png',
   './icons/panda-scholar.png',
-  './icons/panda-crown.png'
+  './icons/panda-crown.png',
+  './icons/panda-cheer-180.png',
+  './icons/panda-scholar-180.png',
+  './icons/panda-crown-180.png'
 ];
 
-// インストール時にアセットをキャッシュ
+// インストール時にアセットをキャッシュし、即座に有効化
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(ASSETS_TO_CACHE);

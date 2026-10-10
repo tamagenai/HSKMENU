@@ -116,27 +116,30 @@ const HSK_APPS = [
   }
 ];
 
-// 3種類の可愛いパンダアイコン設定
+// 3種類の可愛いパンダアイコン設定（iPad用180x180アイコン＆専用manifest連動）
 const PANDA_ICONS = {
   cheer: {
     id: 'cheer',
-    name: '応援パンダ',
-    src: 'icons/panda-cheer.png',
-    icon512: 'icons/icon-512x512.png',
+    name: '① 応援パンダ',
+    src: './icons/panda-cheer.png',
+    icon180: './icons/panda-cheer-180.png',
+    manifest: './manifest.json',
     defaultQuote: '「加油！今日も好きな級のカードをタップして中国語を楽しもう🐼✨」'
   },
   scholar: {
     id: 'scholar',
-    name: 'パンダ博士',
-    src: 'icons/panda-scholar.png',
-    icon512: 'icons/panda-scholar-512.png',
+    name: '② パンダ博士',
+    src: './icons/panda-scholar.png',
+    icon180: './icons/panda-scholar-180.png',
+    manifest: './manifest-scholar.json',
     defaultQuote: '「温故知新！1級〜5級までコツコツ積み重ねれば必ず合格できるよ👓📖」'
   },
   crown: {
     id: 'crown',
-    name: '王冠パンダ',
-    src: 'icons/panda-crown.png',
-    icon512: 'icons/panda-crown-512.png',
+    name: '③ 王冠パンダ',
+    src: './icons/panda-crown.png',
+    icon180: './icons/panda-crown-180.png',
+    manifest: './manifest-crown.json',
     defaultQuote: '「目指せ100点満点！満点ファンファーレを鳴らして次の級へ進もう👑🏆」'
   }
 };
@@ -246,11 +249,22 @@ function applyPandaIcon(iconKey, playSound = false) {
     bubbleText.textContent = config.defaultQuote;
   }
 
-  // Apple Touch Icon と Favicon も動的に更新
-  const appleIcon = document.getElementById('apple-touch-icon-link');
-  if (appleIcon) {
-    appleIcon.href = config.src;
+  // iPad / iPhone 向け Apple Touch Icon (全サイズ) と Manifest を動的に更新
+  ['apple-touch-icon-default', 'apple-touch-icon-152', 'apple-touch-icon-167', 'apple-touch-icon-180'].forEach((id) => {
+    const linkEl = document.getElementById(id);
+    if (linkEl) linkEl.href = config.icon180;
+  });
+
+  const manifestLink = document.getElementById('manifest-link');
+  if (manifestLink) {
+    manifestLink.href = config.manifest;
   }
+
+  // iPad追加ガイドモーダル内のプレビューも更新
+  const modalPreviewImg = document.getElementById('modal-panda-preview-img');
+  const modalPreviewName = document.getElementById('modal-panda-preview-name');
+  if (modalPreviewImg) modalPreviewImg.src = config.icon180;
+  if (modalPreviewName) modalPreviewName.textContent = `現在のアイコン：${config.name}`;
 
   // ボタンのアクティブ状態を更新
   document.querySelectorAll('.icon-opt-btn').forEach((btn) => {
@@ -497,29 +511,95 @@ function launchConfetti() {
   requestAnimationFrame(animate);
 }
 
-// PWA インストールボタン制御
-let deferredPrompt;
-function initPwaInstall() {
-  const installBtn = document.getElementById('install-button');
-  if (!installBtn) return;
+// PWA インストール＆iPad/iPhone ホーム画面追加ガイド制御
+let deferredPrompt = null;
 
+function initPwaInstall() {
+  const installFab = document.getElementById('install-button');
+  const inlineInstallBtn = document.getElementById('inline-install-btn');
+  const heroInstallBtn = document.getElementById('hero-install-btn');
+  const iosModal = document.getElementById('ios-install-modal');
+  const closeBtn = document.getElementById('ios-modal-close');
+  const okBtn = document.getElementById('ios-modal-ok-btn');
+  const copyUrlBtn = document.getElementById('copy-url-btn');
+
+  // すでにホーム画面から起動（スタンドアロン動作）しているか判定
+  const isStandalone =
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true;
+
+  if (isStandalone) {
+    if (installFab) installFab.classList.add('hidden');
+    if (inlineInstallBtn) inlineInstallBtn.style.display = 'none';
+    if (heroInstallBtn) {
+      heroInstallBtn.innerHTML = '<span>🐼 ホーム画面アプリ起動中✨</span>';
+    }
+  }
+
+  // Chrome / Edge / Android 向け beforeinstallprompt イベント保持
   window.addEventListener('beforeinstallprompt', (e) => {
     e.preventDefault();
     deferredPrompt = e;
-    installBtn.style.display = 'inline-flex';
+    if (installFab && !isStandalone) {
+      installFab.classList.remove('hidden');
+    }
   });
 
-  installBtn.addEventListener('click', async () => {
-    if (!deferredPrompt) return;
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    console.log(`User response to the install prompt: ${outcome}`);
-    deferredPrompt = null;
-    installBtn.style.display = 'none';
-  });
+  // インストールボタン押下時の共通ハンドラ（iPadでも確実に動作）
+  async function handleInstallClick() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      console.log(`User response to the install prompt: ${outcome}`);
+      deferredPrompt = null;
+      if (outcome === 'accepted' && installFab) {
+        installFab.classList.add('hidden');
+      }
+      return;
+    }
+
+    // iPad / iPhone (Safari / Chrome) や beforeinstallprompt 非対応環境では図解ガイドモーダルを表示
+    if (iosModal) {
+      iosModal.classList.add('open');
+      playCutePopSound();
+    }
+  }
+
+  if (installFab) installFab.addEventListener('click', handleInstallClick);
+  if (inlineInstallBtn) inlineInstallBtn.addEventListener('click', handleInstallClick);
+  if (heroInstallBtn) heroInstallBtn.addEventListener('click', handleInstallClick);
+
+  // モーダルを閉じる処理
+  function closeIosModal() {
+    if (iosModal) iosModal.classList.remove('open');
+  }
+
+  if (closeBtn) closeBtn.addEventListener('click', closeIosModal);
+  if (okBtn) okBtn.addEventListener('click', closeIosModal);
+  if (iosModal) {
+    iosModal.addEventListener('click', (e) => {
+      if (e.target === iosModal) closeIosModal();
+    });
+  }
+
+  // URLコピーボタン
+  if (copyUrlBtn) {
+    copyUrlBtn.addEventListener('click', async () => {
+      const urlToCopy = 'https://tamagenai.github.io/HSKMENU/';
+      try {
+        await navigator.clipboard.writeText(urlToCopy);
+        copyUrlBtn.textContent = '✅ コピー完了！';
+        setTimeout(() => {
+          copyUrlBtn.textContent = '📋 URLをコピー';
+        }, 2000);
+      } catch (err) {
+        copyUrlBtn.textContent = 'URLを長押しでコピー';
+      }
+    });
+  }
 
   window.addEventListener('appinstalled', () => {
-    installBtn.style.display = 'none';
+    if (installFab) installFab.classList.add('hidden');
     deferredPrompt = null;
   });
 }
